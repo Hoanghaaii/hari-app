@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # PostgreSQL cho User Service
+  postgres-user:
+    image: postgres:15-alpine
+    container_name: postgres-user
+    environment:
+      POSTGRES_DB: user_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - '5432:5432'
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - hari-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d user_service_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL cho Auth Service
+  postgres-auth:
+    image: postgres:15-alpine
+    container_name: postgres-auth
+    environment:
+      POSTGRES_DB: auth_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - '5433:5432'
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - hari-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d auth_service_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis cho caching
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+    command: redis-server --requirepass redis123
+    volumes:
+      - redis_data:/data
+    networks:
+      - hari-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # pgAdmin cho quản lý database (optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@hari.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - '8080:80'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - hari-network
+    depends_on:
+      - postgres-user
+      - postgres-auth
+
+networks:
+  hari-network:
+    driver: bridge
+
+volumes:
+  user_db_data:
+  auth_db_data:
+  redis_data:
+  pgadmin_data:

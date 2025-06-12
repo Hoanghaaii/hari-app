@@ -1,0 +1,24 @@
+syntax = "proto3";
+package user;
+
+service UserService {
+  rpc Ping(Empty) returns (PingResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+}
+
+message Empty {}
+
+message PingResponse {
+  string message = 1;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  string id = 1;
+  string message = 2;
+  string service = 3;
+  string timestamp = 4;
+}
