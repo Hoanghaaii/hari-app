@@ -1,27 +1,34 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HealthController } from './health.controller';
+import { ConfigService } from '../config';
 
 @Module({
   imports: [
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'USER_SERVICE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'user',
-          protoPath: './proto/user.proto',
-          url: 'localhost:50051',
-        },
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: configService.userService.package,
+            protoPath: configService.userService.protoPath,
+            url: configService.userService.url,
+          },
+        }),
+        inject: [ConfigService],
       },
       {
         name: 'AUTH_SERVICE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'auth',
-          protoPath: './proto/auth.proto',
-          url: 'localhost:50052',
-        },
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: configService.authService.package,
+            protoPath: configService.authService.protoPath,
+            url: configService.authService.url,
+          },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],

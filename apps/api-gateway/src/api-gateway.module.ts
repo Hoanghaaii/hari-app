@@ -3,27 +3,20 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserGatewayController } from './presentation/controllers/user-gateway.controller';
 import { AuthGatewayController } from './presentation/controllers/auth-gateway.controller';
 import { HealthModule } from './infrastructure/health/health.module';
+import { appConfig } from './infrastructure/config/app.config';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
-        name: 'USER_SERVICE',
+        name: appConfig.services.user.name,
         transport: Transport.GRPC,
-        options: {
-          package: 'user',
-          protoPath: './proto/user.proto',
-          url: 'localhost:50051',
-        },
+        options: appConfig.services.user.options,
       },
       {
-        name: 'AUTH_SERVICE',
+        name: appConfig.services.auth.name,
         transport: Transport.GRPC,
-        options: {
-          package: 'auth',
-          protoPath: './proto/auth.proto',
-          url: 'localhost:50052',
-        },
+        options: appConfig.services.auth.options,
       },
     ]),
     HealthModule,
