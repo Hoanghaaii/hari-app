@@ -6,34 +6,45 @@ import { createAppConfig } from '../config/app.config';
 
 @Module({
   imports: [
-    ConfigModule, // Import ConfigModule để sử dụng ConfigService
-    ClientsModule.registerAsync([
-      {
-        name: 'USER_SERVICE',
-        imports: [ConfigModule],
-        useFactory: (configService: ConfigService) => {
-          const appConfig = createAppConfig(configService);
-          return {
-            transport: Transport.GRPC,
-            options: appConfig.services.user.options,
-          };
+    ConfigModule.forRoot({
+      envFilePath: ['./envs/.env.api-gateway', './envs/.env.shared'],
+      isGlobal: true,
+    }),
+    ClientsModule.registerAsync({
+      clients: [
+        {
+          name: 'USER_SERVICE',
+          useFactory: (configService: ConfigService) => {
+            const appConfig = createAppConfig(configService);
+            return {
+              transport: Transport.GRPC,
+              options: appConfig.services.user.options,
+            };
+          },
+          inject: [ConfigService],
         },
-        inject: [ConfigService],
-      },
-      {
-        name: 'AUTH_SERVICE',
-        imports: [ConfigModule],
-        useFactory: (configService: ConfigService) => {
-          const appConfig = createAppConfig(configService);
-          return {
-            transport: Transport.GRPC,
-            options: appConfig.services.auth.options,
-          };
+        {
+          name: 'AUTH_SERVICE',
+          useFactory: (configService: ConfigService) => {
+            const appConfig = createAppConfig(configService);
+            return {
+              transport: Transport.GRPC,
+              options: appConfig.services.auth.options,
+            };
+          },
+          inject: [ConfigService],
         },
-        inject: [ConfigService],
-      },
-    ]),
+      ],
+    }),
   ],
   controllers: [HealthController],
+  providers: [
+    {
+      provide: 'APP_CONFIG',
+      useFactory: (configService: ConfigService) =>
+        createAppConfig(configService),
+      inject: [ConfigService],
+    },
+  ],
 })
 export class HealthModule {}

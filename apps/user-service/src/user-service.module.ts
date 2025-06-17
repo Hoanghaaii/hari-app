@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserController } from './presentation/controllers/user.controller';
 import { UserService } from './application/services/user.service';
 import { HealthModule } from './infrastructure/health/health.module';
+import { createUserConfig } from './infrastructure/config/user.config';
 
 @Module({
   imports: [
@@ -11,20 +12,25 @@ import { HealthModule } from './infrastructure/health/health.module';
       envFilePath: ['./envs/.env.user', './envs/.env.shared'],
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT ?? '5432') || 5432,
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres123',
-      database: process.env.DB_NAME || 'user_service_db',
-      autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV !== 'production', // Chỉ sync trong dev
-      logging: process.env.NODE_ENV === 'development', // Log queries trong dev
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        const appConfig = createUserConfig(configService);
+        return appConfig.db;
+      },
+      inject: [ConfigService],
     }),
     HealthModule,
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [
+    UserService,
+    {
+      provide: 'APP_CONFIG',
+      useFactory: (configService: ConfigService) =>
+        createUserConfig(configService),
+      inject: [ConfigService],
+    },
+  ],
 })
 export class UserServiceModule {}
