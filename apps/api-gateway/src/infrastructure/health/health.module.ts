@@ -1,33 +1,35 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HealthController } from './health.controller';
-import { ConfigService } from '../config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { createAppConfig } from '../config/app.config';
 
 @Module({
   imports: [
+    ConfigModule, // Import ConfigModule để sử dụng ConfigService
     ClientsModule.registerAsync([
       {
         name: 'USER_SERVICE',
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.GRPC,
-          options: {
-            package: configService.userService.package,
-            protoPath: configService.userService.protoPath,
-            url: configService.userService.url,
-          },
-        }),
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => {
+          const appConfig = createAppConfig(configService);
+          return {
+            transport: Transport.GRPC,
+            options: appConfig.services.user.options,
+          };
+        },
         inject: [ConfigService],
       },
       {
         name: 'AUTH_SERVICE',
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.GRPC,
-          options: {
-            package: configService.authService.package,
-            protoPath: configService.authService.protoPath,
-            url: configService.authService.url,
-          },
-        }),
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => {
+          const appConfig = createAppConfig(configService);
+          return {
+            transport: Transport.GRPC,
+            options: appConfig.services.auth.options,
+          };
+        },
         inject: [ConfigService],
       },
     ]),

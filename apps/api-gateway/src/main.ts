@@ -1,9 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { ApiGatewayModule } from './api-gateway.module';
-import { appConfig } from './infrastructure/config/app.config';
+import { ConfigService } from '@nestjs/config';
+import { createAppConfig } from './infrastructure/config/app.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiGatewayModule);
+  const configService = app.get(ConfigService);
+  const appConfig = createAppConfig(configService);
 
   if (appConfig.cors.enabled) {
     app.enableCors({
