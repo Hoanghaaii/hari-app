@@ -1,38 +1,20 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-} from 'typeorm';
-import { AuthUser } from './auth-user.entity';
+import { Token } from '../value-objects/token.vo';
 
-@Entity('password_reset_tokens')
-@Index(['token_hash'])
-@Index(['expires_at'])
 export class PasswordResetToken {
-  @PrimaryGeneratedColumn()
-  id: number;
+  constructor(
+    public readonly id: number,
+    public readonly userId: number,
+    public token: Token,
+    public expiresAt: Date,
+    public usedAt?: Date,
+    public createdAt: Date = new Date(),
+  ) {}
 
-  @Column({ type: 'int' })
-  user_id: number;
+  isExpired(current = new Date()): boolean {
+    return current > this.expiresAt;
+  }
 
-  @Column({ type: 'varchar', unique: true })
-  token_hash: string;
-
-  @Column({ type: 'timestamp' })
-  expires_at: Date;
-
-  @Column({ type: 'timestamp', nullable: true })
-  used_at: Date;
-
-  @CreateDateColumn({ type: 'timestamp' })
-  created_at: Date;
-
-  // Relations
-  @ManyToOne(() => AuthUser, (user) => user.password_reset_tokens)
-  @JoinColumn({ name: 'user_id' })
-  user: AuthUser;
-} 
+  markUsed(date: Date = new Date()) {
+    this.usedAt = date;
+  }
+}

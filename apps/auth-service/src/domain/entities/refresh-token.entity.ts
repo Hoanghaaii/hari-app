@@ -1,50 +1,24 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-} from 'typeorm';
-import { AuthUser } from './auth-user.entity';
+import { Token } from '../value-objects/token.vo';
+import { IpAddress } from '../value-objects/ip-address.vo';
+import { UserAgent } from '../value-objects/user-agent.vo';
+import { DeviceInfo } from '../value-objects/device-info.vo';
 
-@Entity('refresh_tokens')
-@Index(['user_id', 'device_info'])
-@Index(['expires_at'])
 export class RefreshToken {
-  @PrimaryGeneratedColumn()
-  id: number;
+  constructor(
+    public readonly id: number,
+    public readonly userId: number,
+    public token: Token,
+    public deviceInfo: DeviceInfo,
+    public ipAddress: IpAddress,
+    public userAgent: UserAgent,
+    public expiresAt: Date,
+    public isRevoked: boolean = false,
+    public revokedAt?: Date,
+    public createdAt: Date = new Date(),
+  ) {}
 
-  @Column({ type: 'int' })
-  user_id: number;
-
-  @Column({ type: 'varchar', unique: true })
-  token_hash: string;
-
-  @Column({ type: 'varchar' })
-  device_info: string;
-
-  @Column({ type: 'varchar' })
-  ip_address: string;
-
-  @Column({ type: 'text' })
-  user_agent: string;
-
-  @Column({ type: 'timestamp' })
-  expires_at: Date;
-
-  @Column({ type: 'boolean', default: false })
-  is_revoked: boolean;
-
-  @Column({ type: 'timestamp', nullable: true })
-  revoked_at: Date;
-
-  @CreateDateColumn({ type: 'timestamp' })
-  created_at: Date;
-
-  // Relations
-  @ManyToOne(() => AuthUser, (user) => user.refresh_tokens)
-  @JoinColumn({ name: 'user_id' })
-  user: AuthUser;
-} 
+  revoke(date: Date = new Date()) {
+    this.isRevoked = true;
+    this.revokedAt = date;
+  }
+}

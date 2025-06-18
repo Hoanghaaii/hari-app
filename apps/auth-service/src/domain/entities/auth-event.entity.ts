@@ -1,68 +1,27 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-} from 'typeorm';
-import { AuthUser } from './auth-user.entity';
+import { IpAddress } from '../value-objects/ip-address.vo';
+import { UserAgent } from '../value-objects/user-agent.vo';
+import { DeviceInfo } from '../value-objects/device-info.vo';
 
-export enum AuthEventType {
-  LOGIN = 'login',
-  LOGOUT = 'logout',
-  PASSWORD_CHANGE = 'password_change',
-  OAUTH_CONNECT = 'oauth_connect',
-  OAUTH_DISCONNECT = 'oauth_disconnect',
-  FAILED_LOGIN = 'failed_login',
-  ACCOUNT_LOCKED = 'account_locked',
-  TOKEN_REFRESH = 'token_refresh',
-}
-
-@Entity('auth_events')
-@Index(['user_id', 'event_type'])
-@Index(['user_id', 'created_at'])
-@Index(['event_type', 'created_at'])
 export class AuthEvent {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'int' })
-  user_id: number;
-
-  @Column({
-    type: 'enum',
-    enum: AuthEventType,
-  })
-  event_type: AuthEventType;
-
-  @Column({ type: 'varchar', nullable: true })
-  provider: string;
-
-  @Column({ type: 'varchar' })
-  ip_address: string;
-
-  @Column({ type: 'text' })
-  user_agent: string;
-
-  @Column({ type: 'varchar' })
-  device_info: string;
-
-  @Column({ type: 'boolean' })
-  success: boolean;
-
-  @Column({ type: 'varchar', nullable: true })
-  failure_reason: string;
-
-  @Column({ type: 'json' })
-  metadata: Record<string, any>;
-
-  @CreateDateColumn({ type: 'timestamp' })
-  created_at: Date;
-
-  // Relations
-  @ManyToOne(() => AuthUser, (user) => user.auth_events)
-  @JoinColumn({ name: 'user_id' })
-  user: AuthUser;
+  constructor(
+    public readonly id: number,
+    public readonly userId: number,
+    public readonly eventType:
+      | 'login'
+      | 'logout'
+      | 'password_change'
+      | 'oauth_connect'
+      | 'oauth_disconnect'
+      | 'failed_login'
+      | 'account_locked'
+      | 'token_refresh',
+    public readonly provider?: string,
+    public readonly ipAddress?: IpAddress,
+    public readonly userAgent?: UserAgent,
+    public readonly deviceInfo?: DeviceInfo,
+    public readonly success: boolean = true,
+    public readonly failureReason?: string,
+    public readonly metadata: Record<string, any> = {},
+    public readonly createdAt: Date = new Date(),
+  ) {}
 }
