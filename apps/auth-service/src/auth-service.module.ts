@@ -5,6 +5,7 @@ import { AuthController } from './presentation/controllers/auth.controller';
 import { AuthService } from './application/services/auth.service';
 import { HealthModule } from './infrastructure/health/health.module';
 import { createAuthConfig } from './infrastructure/config/auth.config';
+import { AuthEntityModule } from './domain/entities/auth.entity.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { createAuthConfig } from './infrastructure/config/auth.config';
       inject: [ConfigService],
     }),
     HealthModule,
+    AuthEntityModule,
   ],
   controllers: [AuthController],
   providers: [
