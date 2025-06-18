@@ -1,37 +1,32 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Index,
-} from 'typeorm';
-
-@Entity('rate_limits')
-@Index(['identifier', 'action'])
-@Index(['blocked_until'])
 export class RateLimit {
-  @PrimaryGeneratedColumn()
-  id: number;
+  constructor(
+    public readonly id: number,
+    public readonly identifier: string,
+    public readonly action: string,
+    public attempts: number = 0,
+    public windowStart: Date = new Date(),
+    public blockedUntil?: Date,
+    public createdAt: Date = new Date(),
+    public updatedAt: Date = new Date(),
+  ) {}
 
-  @Column({ type: 'varchar' })
-  identifier: string;
+  incrementAttempt() {
+    this.attempts += 1;
+    this.updatedAt = new Date();
+  }
 
-  @Column({ type: 'varchar' })
-  action: string;
+  resetAttempts() {
+    this.attempts = 0;
+    this.windowStart = new Date();
+    this.updatedAt = new Date();
+  }
 
-  @Column({ type: 'int', default: 0 })
-  attempts: number;
+  blockUntil(date: Date) {
+    this.blockedUntil = date;
+    this.updatedAt = new Date();
+  }
 
-  @Column({ type: 'timestamp' })
-  window_start: Date;
-
-  @Column({ type: 'timestamp', nullable: true })
-  blocked_until: Date;
-
-  @CreateDateColumn({ type: 'timestamp' })
-  created_at: Date;
-
-  @UpdateDateColumn({ type: 'timestamp' })
-  updated_at: Date;
-} 
+  isBlocked(now = new Date()): boolean {
+    return !!this.blockedUntil && now < this.blockedUntil;
+  }
+}

@@ -1,42 +1,25 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToOne,
-  JoinColumn,
-} from 'typeorm';
-import { AuthUser } from './auth-user.entity';
+import { BackupCodes } from '../value-objects/backup-codes.vo';
 
-@Entity('user_2fa')
-export class User2fa {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class UserTwoFactorAuth {
+  constructor(
+    public readonly id: number,
+    public readonly userId: number,
+    public secretKey: string,
+    public backupCodes: BackupCodes,
+    public isEnabled: boolean = false,
+    public enabledAt?: Date,
+    public createdAt: Date = new Date(),
+    public updatedAt: Date = new Date(),
+  ) {}
 
-  @Column({ type: 'int', unique: true })
-  user_id: number;
+  enable() {
+    this.isEnabled = true;
+    this.enabledAt = new Date();
+    this.updatedAt = new Date();
+  }
 
-  @Column({ type: 'varchar' })
-  secret_key: string;
-
-  @Column({ type: 'text' })
-  backup_codes: string;
-
-  @Column({ type: 'boolean', default: false })
-  is_enabled: boolean;
-
-  @Column({ type: 'timestamp', nullable: true })
-  enabled_at: Date;
-
-  @CreateDateColumn({ type: 'timestamp' })
-  created_at: Date;
-
-  @UpdateDateColumn({ type: 'timestamp' })
-  updated_at: Date;
-
-  // Relations
-  @OneToOne(() => AuthUser, (user) => user.user_2fa)
-  @JoinColumn({ name: 'user_id' })
-  user: AuthUser;
-} 
+  disable() {
+    this.isEnabled = false;
+    this.updatedAt = new Date();
+  }
+}
