@@ -2,8 +2,8 @@ import { Email } from '../value-objects/email.vo';
 import { HashedPassword } from '../value-objects/hashed-password.vo';
 
 export class AuthUser {
-  constructor(
-    public readonly id: number,
+  private constructor(
+    public readonly id: number | undefined,
     public email: Email,
     public password: HashedPassword | null,
     public isActive: boolean = true,
@@ -12,6 +12,19 @@ export class AuthUser {
     public createdAt: Date = new Date(),
     public updatedAt: Date = new Date(),
   ) {}
+
+  static create(email: Email, password: HashedPassword): AuthUser {
+    return new AuthUser(
+      undefined,
+      email,
+      password,
+      true,
+      false,
+      undefined,
+      new Date(),
+      new Date()
+    );
+  }
 
   verifyEmail(date: Date = new Date()) {
     this.isVerified = true;
