@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { UserGatewayController } from './presentation/controllers/user-gateway.controller';
-import { AuthGatewayController } from './presentation/controllers/auth-gateway.controller';
-import { HealthModule } from './infrastructure/health/health.module';
+import { UserController } from './routes/user.controller';
+import { AuthController } from './routes/auth.controller';
+import { HealthController } from './routes/health.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { createAppConfig } from './infrastructure/config/app.config';
+import { createAppConfig } from './config/app.config';
 
 @Module({
   imports: [
@@ -38,9 +38,8 @@ import { createAppConfig } from './infrastructure/config/app.config';
         inject: [ConfigService],
       },
     ]),
-    HealthModule,
   ],
-  controllers: [UserGatewayController, AuthGatewayController],
+  controllers: [UserController, AuthController, HealthController],
   providers: [
     {
       provide: 'APP_CONFIG',

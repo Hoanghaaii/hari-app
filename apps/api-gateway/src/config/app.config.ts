@@ -29,4 +29,4 @@ export const createAppConfig = (configService: ConfigService) =>
         ? configService.get('CORS_ORIGIN').split(',')
         : undefined,
     },
-  }) as const;
+  }) as const; 

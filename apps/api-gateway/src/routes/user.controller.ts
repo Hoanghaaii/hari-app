@@ -7,7 +7,7 @@ interface UserService {
 }
 
 @Controller('users')
-export class UserGatewayController {
+export class UserController {
   private userService: UserService;
 
   constructor(@Inject('USER_SERVICE') private client: ClientGrpc) {}
@@ -25,4 +25,4 @@ export class UserGatewayController {
   async getUser(@Param('id') id: string) {
     return this.userService.getUser({ id });
   }
-}
+} 

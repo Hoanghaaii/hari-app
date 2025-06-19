@@ -8,7 +8,7 @@ interface AuthService {
 }
 
 @Controller('auth')
-export class AuthGatewayController {
+export class AuthController {
   private authService: AuthService;
 
   constructor(@Inject('AUTH_SERVICE') private client: ClientGrpc) {}
@@ -31,4 +31,4 @@ export class AuthGatewayController {
   async validateToken(@Query('token') token: string) {
     return this.authService.validateToken({ token });
   }
-}
+} 
