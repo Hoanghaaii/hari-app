@@ -21,4 +21,8 @@ export class RefreshToken {
     this.isRevoked = true;
     this.revokedAt = date;
   }
+
+  isExpired(now: Date = new Date()): boolean {
+    return now > this.expiresAt;
+  }
 }
