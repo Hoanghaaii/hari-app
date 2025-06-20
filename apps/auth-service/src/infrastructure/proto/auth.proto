@@ -5,13 +5,19 @@ package auth;
 service AuthService {
   rpc Register (RegisterRequest) returns (AuthResponse);
   rpc Login (LoginRequest) returns (AuthResponse);
+  rpc VerifyEmail (VerifyEmailRequest) returns (SimpleResponse);
+  rpc RequestEmailVerification (RequestEmailVerificationRequest) returns (SimpleResponse);
+  rpc ForgotPassword (ForgotPasswordRequest) returns (SimpleResponse);
+  rpc ResetPassword (ResetPasswordRequest) returns (SimpleResponse);
+  rpc RefreshToken (RefreshTokenRequest) returns (AuthResponse);
+  rpc Logout (LogoutRequest) returns (SimpleResponse);
+  rpc OAuthLogin (OAuthLoginRequest) returns (AuthResponse);
   rpc Ping (PingRequest) returns (PingResponse);
 }
 
 message RegisterRequest {
   string email = 1;
   string password = 2;
-  string name = 3;
 }
 
 message LoginRequest {
@@ -19,14 +25,59 @@ message LoginRequest {
   string password = 2;
 }
 
+message VerifyEmailRequest {
+  string token = 1;
+}
+
+message RequestEmailVerificationRequest {
+  string email = 1;
+}
+
+message ForgotPasswordRequest {
+  string email = 1;
+}
+
+message ResetPasswordRequest {
+  string token = 1;
+  string newPassword = 2;
+}
+
+message RefreshTokenRequest {
+  string refreshToken = 1;
+}
+
+message LogoutRequest {
+  string refreshToken = 1;
+}
+
+message OAuthLoginRequest {
+  string provider = 1;
+  string providerUserId = 2;
+  string accessToken = 3;
+  string refreshToken = 4;
+}
+
 message AuthResponse {
   string accessToken = 1;
   string refreshToken = 2;
-  string message = 3;
+  UserInfo user = 3;
+  string message = 4;
+}
+
+message UserInfo {
+  string id = 1;
+  string email = 2;
+  bool isActive = 3;
+  bool isEmailVerified = 4;
+  string createdAt = 5;
+}
+
+message SimpleResponse {
+  string message = 1;
+  int32 code = 2;
 }
 
 message PingRequest {}
-
 message PingResponse {
   string message = 1;
 }
