@@ -23,7 +23,9 @@
     "start:auth-service": "nest start auth-service --watch",
     "build:api-gateway": "nest build api-gateway",
     "build:user-service": "nest build user-service",
-    "build:auth-service": "nest build auth-service"
+    "build:auth-service": "nest build auth-service",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4",
