@@ -7,13 +7,9 @@ export class HealthController {
   private userService: any;
   private authService: any;
 
-  constructor(
-    @Inject('USER_SERVICE') private userClient: ClientGrpc,
-    @Inject('AUTH_SERVICE') private authClient: ClientGrpc,
-  ) {}
+  constructor(@Inject('AUTH_SERVICE') private authClient: ClientGrpc) {}
 
   onModuleInit() {
-    this.userService = this.userClient.getService('UserService');
     this.authService = this.authClient.getService('AuthService');
   }
 
@@ -50,4 +46,4 @@ export class HealthController {
       timestamp: new Date().toISOString(),
     };
   }
-} 
+}

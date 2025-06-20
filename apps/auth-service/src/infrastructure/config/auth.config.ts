@@ -5,7 +5,7 @@ export const createAuthConfig = (configService: ConfigService) =>
     grpc: {
       options: {
         package: 'auth',
-        protoPath: './proto/auth.proto',
+        protoPath: './apps/auth-service/src/infrastructure/proto/auth.proto',
         url: configService.get('AUTH_SERVICE_URL', '0.0.0.0:50052'),
       },
     },

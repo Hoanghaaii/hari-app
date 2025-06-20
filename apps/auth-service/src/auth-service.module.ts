@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthController } from './presentation/controllers/auth.controller';
 import { AuthService } from './application/services/auth.service';
 import { HealthModule } from './infrastructure/health/health.module';
 import { createAuthConfig } from './infrastructure/config/auth.config';
+import { AuthGrpcController } from './presentation/grpc/user.grpc.controller';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { createAuthConfig } from './infrastructure/config/auth.config';
     }),
     HealthModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthGrpcController],
   providers: [
     AuthService,
     {

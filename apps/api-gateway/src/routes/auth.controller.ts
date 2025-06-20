@@ -5,6 +5,7 @@ interface AuthService {
   ping(data: {}): any;
   login(data: { email: string; password: string }): any;
   validateToken(data: { token: string }): any;
+  register(data: { email: string; password: string; name: string }): any;
 }
 
 @Controller('auth')
@@ -30,5 +31,10 @@ export class AuthController {
   @Get('validate')
   async validateToken(@Query('token') token: string) {
     return this.authService.validateToken({ token });
+  }
+
+  @Post('register')
+  async register(@Body() body: { email: string; password: string; name: string }) {
+    return this.authService.register(body);
   }
 } 
